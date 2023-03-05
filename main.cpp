@@ -5,6 +5,7 @@
 #include "Shader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include "Texture.h"
 
 // Data
 float vertices[] = {
@@ -93,48 +94,9 @@ int main() {
 	glUseProgram(shader.ID);
 
 	// 纹理
-	int width, height, nrChannels;
-	unsigned int texture1, texture2;
-	unsigned char* data;
+	Texture texture1("container.jpg",GL_TEXTURE0);
+	Texture texture2("awesomeface.png",GL_TEXTURE1);
 
-
-
-	glGenTextures(1, &texture1);
-	//glActiveTexture(GL_TEXTURE0); // 在绑定纹理之前先激活纹理单元（PS：默认激活0号纹理单元，且采样器默认使用该纹理单元，可省略）
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	// 为当前绑定纹理设置环绕过滤(采样)方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
-	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cout << "图片数据读取失败" << std::endl;
-	}
-	stbi_image_free(data);
-
-	glGenTextures(1, &texture2);
-	glActiveTexture(GL_TEXTURE1); // 激活1号纹理单元 uniform sampler2D texture2;
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	// 为当前绑定纹理设置环绕过滤(采样)方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	stbi_set_flip_vertically_on_load(true); // 反转y轴
-	data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
-	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cout << "图片数据读取失败" << std::endl;
-	}
-	stbi_image_free(data);
 	// 设置纹理采样器所对应的纹理单元
 	glUniform1i(glGetUniformLocation(shader.ID, "texture1"), 0);
 	glUniform1i(glGetUniformLocation(shader.ID, "texture2"), 1);
