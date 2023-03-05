@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <string>
+#include "Shader.h"
 
 // Data
 float vertices[] = {
@@ -18,26 +20,11 @@ unsigned int indices[] = {
 	0, 1, 3, // 第一个三角形
 	1, 2, 3  // 第二个三角形
 };
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\0";
+
 unsigned int VBO;
 unsigned int VAO;
 unsigned int EBO;
-unsigned int vertexShader;
-unsigned int fragmentShader;
 unsigned int shaderProgram;
-int success;
-char infoLog[512];
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -75,7 +62,7 @@ int main() {
 	glViewport(0, 0, 800, 600);
 
 	// 注册回调函数
-	//glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// 数据处理
 	glGenBuffers(1, &VBO);
@@ -90,36 +77,8 @@ int main() {
 	glEnableVertexAttribArray(0);
 
 	// 着色器
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "编译出错：\n" << infoLog << std::endl;
-	}
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "编译出错：\n" << infoLog << std::endl;
-	}
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "链接出错：\n" << infoLog << std::endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	
-
+	Shader shader("vertex.shader","fragment.shader");
+	shaderProgram = shader.ID;
 
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
